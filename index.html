@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fahrrad-Ergonomie Rechner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Fahrrad-Ergonomie Rechner</h1>
+            <p class="header__subtitle">Finde die perfekte Einstellung für dein Fahrrad basierend auf deinen Körpermaßen</p>
+        </header>
+
+        <main class="main">
+            <section class="input-section">
+                <div class="card">
+                    <div class="card__header">
+                        <h2>Deine Körpermaße</h2>
+                        <p class="text-secondary">Gib deine Maße ein - fehlende Werte werden automatisch geschätzt</p>
+                    </div>
+                    <div class="card__body">
+                        <form class="input-form" id="inputForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="geschlecht">
+                                        Geschlecht (optional)
+                                        <span class="tooltip" data-tooltip="Für präzisere Berechnungen">ℹ️</span>
+                                    </label>
+                                    <select class="form-control" id="geschlecht">
+                                        <option value="">Keine Angabe</option>
+                                        <option value="maenner">Männlich</option>
+                                        <option value="frauen">Weiblich</option>
+                                        <option value="divers">Divers</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="fahrradtyp">
+                                        Fahrradtyp *
+                                        <span class="tooltip" data-tooltip="Bestimmt die optimale Sitzposition">ℹ️</span>
+                                    </label>
+                                    <select class="form-control" id="fahrradtyp" required>
+                                        <option value="">Bitte wählen...</option>
+                                        <option value="transporter2">Riese & Müller Transporter2 85 vario</option>
+                                        <option value="cargo_bike">Cargo-Bike / E-Lastenrad</option>
+                                        <option value="city_bike">City-Bike / Hollandrad</option>
+                                        <option value="trekking">Trekking-Bike</option>
+                                        <option value="rennrad">Rennrad</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="koerpergroesse">
+                                        Körpergröße * (cm)
+                                        <span class="tooltip" data-tooltip="Grundlage für alle Berechnungen">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="koerpergroesse" min="140" max="220" step="1" placeholder="z.B. 175">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="schrittlaenge">
+                                        Schrittlänge (cm)
+                                        <span class="tooltip" data-tooltip="Wird geschätzt falls leer">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="schrittlaenge" min="60" max="110" step="0.5" placeholder="Optional">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="schulterbreite">
+                                        Schulterbreite (cm)
+                                        <span class="tooltip" data-tooltip="Für optimale Lenkerbreite">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="schulterbreite" min="30" max="60" step="0.5" placeholder="Optional">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="gewicht">
+                                        Körpergewicht (kg)
+                                        <span class="tooltip" data-tooltip="Für Komfort-Empfehlungen">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="gewicht" min="40" max="150" step="0.5" placeholder="Optional">
+                                </div>
+                            </div>
+
+                            <div class="estimation-notice hidden" id="estimationNotice">
+                                <div class="status status--warning">
+                                    ⚠️ Einige Werte wurden geschätzt. Für präzisere Ergebnisse ergänze alle Maße.
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section hidden" id="resultsSection">
+                <div class="card">
+                    <div class="card__header">
+                        <h2>Deine Fahrrad-Einstellungen</h2>
+                        <p class="text-secondary">Diese Werte sind optimiert für deinen <span id="selectedBikeType"></span></p>
+                    </div>
+                    <div class="card__body">
+                        <div class="results-grid">
+                            <div class="result-item primary">
+                                <div class="result-label">Sattelhöhe</div>
+                                <div class="result-value" id="sattelhoehe">-</div>
+                                <div class="result-desc">Abstand Tretlager-Mitte zu Sattel-Oberkante</div>
+                            </div>
+                            <div class="result-item primary">
+                                <div class="result-label">Lenkerhöhe</div>
+                                <div class="result-value" id="lenkerhoehe">-</div>
+                                <div class="result-desc">Relativ zur Sattelhöhe</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Lenkerbreite</div>
+                                <div class="result-value" id="lenkerbreite">-</div>
+                                <div class="result-desc">Empfohlene Lenkerbreite</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Kniewinkel</div>
+                                <div class="result-value">25-35°</div>
+                                <div class="result-desc">In tiefster Pedalstellung</div>
+                            </div>
+                        </div>
+
+                        <div class="additional-info">
+                            <div class="info-section">
+                                <h3>Einstelltipps</h3>
+                                <ul class="tips-list">
+                                    <li>Ausgangspunkt: Sattelneigung waagerecht (0°)</li>
+                                    <li>Becken leicht nach vorne geneigt</li>
+                                    <li>Rücken in natürlicher S-Form</li>
+                                    <li>Nach Einstellungen immer Probefahrt machen</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Schaubild: Wichtige Messpunkte</h3>
+                        <p class="text-secondary">Hier siehst du, wo die empfohlenen Maße gemessen werden</p>
+                    </div>
+                    <div class="card__body">
+                        <div class="bike-diagram" id="bikeDiagram">
+                            <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Räder -->
+                                <circle cx="80" cy="220" r="35" stroke="var(--color-primary)" stroke-width="3" fill="none"/>
+                                <circle cx="380" cy="220" r="35" stroke="var(--color-primary)" stroke-width="3" fill="none"/>
+                                
+                                <!-- Rahmen -->
+                                <path d="M115 220 L180 220 L280 140 L345 220" stroke="var(--color-primary)" stroke-width="4" fill="none"/>
+                                <line x1="180" y1="220" x2="180" y2="120" stroke="var(--color-primary)" stroke-width="4"/>
+                                <line x1="280" y1="140" x2="280" y2="220" stroke="var(--color-primary)" stroke-width="4"/>
+                                
+                                <!-- Sattelstütze und Sattel -->
+                                <line x1="180" y1="120" x2="180" y2="90" stroke="var(--color-primary)" stroke-width="3"/>
+                                <rect x="160" y="85" width="40" height="10" rx="5" fill="var(--color-primary)"/>
+                                
+                                <!-- Lenker -->
+                                <line x1="280" y1="140" x2="280" y2="110" stroke="var(--color-primary)" stroke-width="3"/>
+                                <rect x="250" y="105" width="60" height="8" rx="4" fill="var(--color-primary)"/>
+                                
+                                <!-- Tretlager -->
+                                <circle cx="280" cy="220" r="10" fill="var(--color-primary)"/>
+                                
+                                <!-- Maßpfeile und Beschriftungen -->
+                                
+                                <!-- Sattelhöhe-Pfeil (Tretlager zu Sattel) -->
+                                <defs>
+                                    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#FF5459"/>
+                                    </marker>
+                                    <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#E68161"/>
+                                    </marker>
+                                    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#32B4C6"/>
+                                    </marker>
+                                </defs>
+                                
+                                <!-- Sattelhöhe-Pfeil -->
+                                <line x1="280" y1="210" x2="180" y2="100" stroke="#FF5459" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-red)"/>
+                                <text x="220" y="150" fill="#FF5459" font-size="14" font-weight="bold">Sattelhöhe</text>
+                                <text x="215" y="165" fill="#FF5459" font-size="11" id="sattelhoehe-label">XX cm</text>
+                                
+                                <!-- Lenkerhöhe-Pfeil (Sattel zu Lenker) -->
+                                <line x1="180" y1="95" x2="280" y2="113" stroke="#E68161" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-orange)"/>
+                                <text x="200" y="90" fill="#E68161" font-size="14" font-weight="bold">Lenkerhöhe-Diff</text>
+                                <text x="215" y="105" fill="#E68161" font-size="11" id="lenkerhoehe-label">XX cm</text>
+                                
+                                <!-- Lenkerbreite-Pfeil -->
+                                <line x1="250" y1="109" x2="310" y2="109" stroke="#32B4C6" stroke-width="2" marker-end="url(#arrowhead-blue)"/>
+                                <line x1="310" y1="109" x2="250" y2="109" stroke="#32B4C6" stroke-width="2" marker-end="url(#arrowhead-blue)"/>
+                                <text x="260" y="95" fill="#32B4C6" font-size="14" font-weight="bold">Lenkerbreite</text>
+                                <text x="270" y="80" fill="#32B4C6" font-size="11" id="lenkerbreite-label">XX cm</text>
+                                
+                                <!-- Beschriftungen der Komponenten -->
+                                <text x="160" y="75" fill="var(--color-text)" font-size="12">Sattel</text>
+                                <text x="240" y="100" fill="var(--color-text)" font-size="12">Lenker</text>
+                                <text x="250" y="245" fill="var(--color-text)" font-size="12">Tretlager</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modell-Spezifikationen (nur bei Transporter2) -->
+                <div class="card model-specs hidden" id="modelSpecs">
+                    <div class="card__header">
+                        <h3>Modell-Spezifikationen</h3>
+                    </div>
+                    <div class="card__body">
+                        <details class="tech-details">
+                            <summary>📋 Riese & Müller Transporter2 85 vario - Technische Daten</summary>
+                            <div class="tech-info" id="specsContent">
+                                <!-- Wird per JavaScript gefüllt -->
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Berechnungsquellen -->
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Berechnungsgrundlagen</h3>
+                    </div>
+                    <div class="card__body">
+                        <details class="tech-details">
+                            <summary>📚 Quellen für Berechnungen anzeigen</summary>
+                            <div class="tech-info">
+                                <ul class="sources-list">
+                                    <li><strong>Hügi-Methode:</strong> Schrittlänge × 0,885 - mehrfach validiert</li>
+                                    <li><strong>DIN 33402:</strong> Deutsche Körpermaße-Norm</li>
+                                    <li><strong>PMC Studien:</strong> Fahrrad-Biomechanik und Ergonomie</li>
+                                    <li><strong>ADAC:</strong> Fahrrad-Ergonomie Leitfaden</li>
+                                    <li><strong>Riese & Müller:</strong> Bedienungsanleitung</li>
+                                    <li><strong>Anthropometrie:</strong> Deutsche Bevölkerungsdaten</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- KI-Überprüfung -->
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Berechnung überprüfen lassen</h3>
+                    </div>
+                    <div class="card__body">
+                        <details class="tech-details">
+                            <summary>🤖 Berechnung von anderen KIs überprüfen lassen</summary>
+                            <div class="tech-info">
+                                <p><small>Klicke auf einen Link, um die Berechnung von einer anderen KI überprüfen zu lassen:</small></p>
+                                <div class="ai-links">
+                                    <a href="#" target="_blank" class="btn btn--outline btn--sm" id="perplexityLink">
+                                        🔍 Mit Perplexity überprüfen
+                                    </a>
+                                    <a href="#" target="_blank" class="btn btn--outline btn--sm" id="chatgptLink">
+                                        💬 Mit ChatGPT überprüfen
+                                    </a>
+                                    <a href="#" target="_blank" class="btn btn--outline btn--sm" id="claudeLink">
+                                        🧠 Mit Claude überprüfen
+                                    </a>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Eigener Link -->
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Eigenen Überprüfungs-Link hinzufügen</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="form-group">
+                            <label class="form-label" for="customLink">
+                                Eigenen Link hinzufügen:
+                                <span class="tooltip" data-tooltip="Für weitere Überprüfungen oder Expertenberatung">ℹ️</span>
+                            </label>
+                            <input type="url" class="form-control" id="customLink" placeholder="https://example.com/my-bike-expert">
+                            <button type="button" class="btn btn--primary btn--sm" id="addCustomLink" style="margin-top: 8px;">
+                                Link hinzufügen
+                            </button>
+                            <div id="customLinkResult" class="mt-8"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card safety-card">
+                    <div class="card__header">
+                        <h3>Sicherheitshinweise</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="safety-grid">
+                            <div class="safety-item">
+                                <strong>⚠️ MIN. INSERTION beachten</strong>
+                                <p>Markierung an Sattelstütze niemals sichtbar</p>
+                            </div>
+                            <div class="safety-item">
+                                <strong>🔧 Bei Unsicherheiten</strong>
+                                <p>Fachhändler konsultieren</p>
+                            </div>
+                        </div>
+                        
+                        <details class="tech-details">
+                            <summary>Technische Details (Drehmomente)</summary>
+                            <div class="tech-info">
+                                <p><small>Sattelstützen-Drehmoment: 8,5-11,5 Nm</small></p>
+                                <p><small>Vorbau-Drehmoment: 17-20 Nm</small></p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Fahrrad-Ergonomie Rechner - Für eine bessere Fahrradeinstellung</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
